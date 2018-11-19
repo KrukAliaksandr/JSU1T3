@@ -1,0 +1,24 @@
+{
+  "name": "jsu1t3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "task3.js",
+  "dependencies": {
+    "eslint": "^5.9.0",
+    "xlsx": "^0.14.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "-test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KrukAliaksandr/JSU1T3.git"
+  },
+  "author": "Aliaksandr_Kruk@epam.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KrukAliaksandr/JSU1T3/issues"
+  },
+  "homepage": "https://github.com/KrukAliaksandr/JSU1T3#readme"
+}

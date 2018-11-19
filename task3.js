@@ -1,57 +1,49 @@
-let XLSX = require('xlsx');
-let js  = {"name":"Alex"}
-let new_ws_name = "SheetJS";
-let wb = XLSX.utils.book_new();
-let inputDir = "D:/work/Javascript/JSU1T3/input/";
-let outputDir = "D:/work/Javascript/JSU1T3/output/";
-let fs = require('fs');
-let path = require('path');
-let file,fileName;
-let walk = function(dir, done) {
-  fs.readdir(dir, function(err, list) {
-    if (err) return done(err);
-    let pending = list.length;
-    if (!pending) return done(null);
-    list.forEach(function(file) {
-      fileName = file.replace(".json","");
-      file = path.resolve(dir, file);
-      fs.stat(file, function(err, stat) {
-        if (stat && stat.isDirectory()) {
-          walk(file, function(err, res) {
-            if (!--pending) done(null);
-          });
-        } else {
-          convert(file,fileName);
-          if (!--pending) done(null);
-        }
+/* eslint-disable no-console */
+/* eslint-disable indent */
+const XLSX = require("xlsx");
+const fs = require("fs");
+
+const new_ws_name = "Sheet1";
+const inputDir = process.argv[2];
+const outputDir = process.argv[3];
+let  results = [];
+
+function readDirectory(directory) {
+  return new Promise((resolve, reject) => {
+    fs.readdir(directory, (err, files) => {
+      files.forEach(file => {
+        results.push(file);
       });
+      if (err) reject(err);
+      else {
+        console.log(results);
+        resolve(results);
+      }
     });
   });
-};
-function convert(file,fileName){
-  let jsonObject = require(file);
-  let wb = XLSX.utils.book_new();
-  let ws_data = [[]];
-  console.log(Object.entries(jsonObject));
-  Object.entries(jsonObject).forEach(([key, value]) => {
-    let item = [[key,value]];
-    if(Array.isArray(item[1])){
-      item[1] = item[1].toString;
-      // let stringForArrayItems = "[";
-      // forEach(valueItem in value)
-      // console.log(valueItem);
-      // {
-      //   stringForArrayItems = stringForArrayItems.concat(",",value);
-      // }
-      // stringForArrayItems = stringForArrayItems.concat("","]");
-      // item[1] = stringForArrayItems;
-    } 
-  ws_data = ws_data.concat(item);})
-  let ws = XLSX.utils.aoa_to_sheet(ws_data);
-  XLSX.utils.book_append_sheet(wb, ws, new_ws_name);
-  if(typeof require !== 'undefined') XLSX = require('xlsx');
-  XLSX.writeFile(wb,outputDir + fileName + ".xlsx");
 }
-walk(inputDir, function(err) {
-  if (err) throw err;
-});
+
+function readFilesAndConvertToXlsx(inputDir) {
+  readDirectory(inputDir).then(function (results) {
+    convertResults(results);
+  }).catch();
+}
+
+function convertResults(results) {
+  results.forEach((file) => {
+    let filePath = inputDir + file;
+    let jsonObject = require(filePath);
+    let wb = XLSX.utils.book_new();
+    let ws_data = [];
+    console.log(Object.entries(jsonObject));
+    Object.entries(jsonObject).forEach(([key, value]) => {
+      let item = [[key, value]];
+      ws_data = ws_data.concat(item);
+    });
+    let ws = XLSX.utils.aoa_to_sheet(ws_data);
+    XLSX.utils.book_append_sheet(wb, ws, new_ws_name);
+    XLSX.writeFile(wb, outputDir + file.replace(".json", ".xlsx"));
+  });
+}
+
+readFilesAndConvertToXlsx(inputDir);
